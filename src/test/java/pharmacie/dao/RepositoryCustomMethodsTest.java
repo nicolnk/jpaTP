@@ -101,4 +101,39 @@ public class RepositoryCustomMethodsTest {
         List<Medicament> disposCat3 = medicamentRepository.findAvailableByCategory(3);
         assertTrue(disposCat3.isEmpty(), "Les médicaments de cat 3 sont marqués indisponibles");
     }
+
+    @Test
+    public void testSuppressionCategorieSansMedicaments() {
+        Categorie vide = new Categorie();
+        vide.setLibelle("Catégorie Vide");
+        vide = categorieRepository.saveAndFlush(vide);
+        Integer id = vide.getCode();
+
+        categorieRepository.deleteById(id);
+        categorieRepository.flush();
+
+        assertFalse(categorieRepository.existsById(id), "On doit pouvoir supprimer une catégorie sans médicaments");
+    }
+
+    @Test
+    public void testCascadeSuppressionCommandeLignes() {
+        assertTrue(commandeRepository.existsById(1));
+
+        commandeRepository.deleteById(1);
+        commandeRepository.flush();
+
+        assertFalse(commandeRepository.existsById(1));
+    }
+
+    @Test
+    public void testCascadeSuppressionDispensaireCommandes() {
+        assertTrue(dispensaireRepository.existsById("D001"));
+        assertTrue(commandeRepository.existsById(1));
+
+        dispensaireRepository.deleteById("D001");
+        dispensaireRepository.flush();
+
+        assertFalse(dispensaireRepository.existsById("D001"));
+        assertFalse(commandeRepository.existsById(1), "La suppression du dispensaire doit supprimer ses commandes");
+    }
 }
