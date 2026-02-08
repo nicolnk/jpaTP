@@ -62,4 +62,43 @@ public class RepositoryCustomMethodsTest {
         List<Dispensaire> idf = dispensaireRepository.findByAdresse_Region("Île-de-France");
         assertEquals(1, idf.size());
     }
+
+    @Test
+    public void testMedicamentSansCategorie(){
+        Medicament m = new Medicament();
+        m.setNom("Medicament sans catégorie");
+        assertThrows(jakarta.validation.ConstraintViolationException.class, () ->  {
+            medicamentRepository.saveAndFlush(m);
+        }, "Le médicament doit avoir une catégorie");
+    }
+
+    @Test
+    public void testSuppressionCategorieAvecMedicaments() {
+        assertThrows(org.springframework.dao.DataIntegrityViolationException.class, () -> {
+            categorieRepository.deleteById(1);
+            categorieRepository.flush();
+        }, "On ne doit pas pouvoir supprimer une catégorie qui a des médicaments");
+    }
+
+    @Test
+    public void testCommandesEnCoursDispensaire() {
+        List<Commande> enCours = commandeRepository.findByDispensaireCodeAndEnvoyeeLeIsNull("D002");
+        assertEquals(1, enCours.size());
+        assertNull(enCours.get(0).getEnvoyeeLe());
+    }
+
+    @Test
+    public void testNombreArticlesCommandes() {
+        Integer total = commandeRepository.countOrderedArticlesByDispensaire("D001");
+        assertEquals(60, total);
+    }
+
+    @Test
+    public void testMedicamentsDisponiblesPourCategorie() {
+        List<Medicament> dispos = medicamentRepository.findAvailableByCategory(1);
+        assertTrue(dispos.stream().anyMatch(m -> m.getNom().equals("Morphine 10mg")));
+
+        List<Medicament> disposCat3 = medicamentRepository.findAvailableByCategory(3);
+        assertTrue(disposCat3.isEmpty(), "Les médicaments de cat 3 sont marqués indisponibles");
+    }
 }

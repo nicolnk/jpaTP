@@ -14,13 +14,13 @@ import lombok.*;
 public class Categorie {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Setter(AccessLevel.NONE) // la clé est auto-générée par la BD, On ne veut pas de "setter"
+	@Setter(AccessLevel.NONE)
 	private Integer code;
 
 	@NonNull
 	@Size(min = 1, max = 255)
 	@Column(unique=true, length = 255)
-	@NotBlank // pour éviter les libellés vides
+	@NotBlank
 	private String libelle;
 
 	@Size(max = 255)
@@ -28,8 +28,7 @@ public class Categorie {
 	private String description;
 
 	@ToString.Exclude
-	// CascadeType.ALL signifie que toutes les opérations CRUD sur la catégorie sont également appliquées à ses médicaments
-	@OneToMany(cascade = {CascadeType.ALL}, mappedBy = "categorie")
+	@OneToMany( mappedBy = "categorie")
 	private List<Medicament> medicaments = new LinkedList<>();
 
 }

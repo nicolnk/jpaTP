@@ -1,6 +1,7 @@
 package pharmacie.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
@@ -43,7 +44,7 @@ public class Medicament {
 
 	/**
 	 * Niveau de reapprovisionnement
-	 * Si le stock devient inférieur ou égal à ce niveau, 
+	 * Si le stock devient inférieur ou égal à ce niveau,
 	 * on doit approvisionner de nouvelles unités de ce médicament auprès d'un fournisseur
 	 */
 	@ToString.Exclude
@@ -62,7 +63,7 @@ public class Medicament {
 	@ManyToOne(optional = false)
 	@NonNull
 	@ToString.Exclude
-
+    @NotNull
 	private Categorie categorie ;
 
 }
